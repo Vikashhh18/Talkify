@@ -1,15 +1,35 @@
-import express from 'express';
-import 'dotenv/config'
-import authRouter from './Routes/auth.route.js';
-import messageRouter from './Routes/message.route.js';
+import express from "express";
+import "dotenv/config";
+import authRouter from "./Routes/auth.route.js";
+import messageRouter from "./Routes/message.route.js";
+import path from "path";
+import dbConnection from "./utils/dbConnection.js";
 
 const app = express();
+const __dirname = path.resolve();
 
-app.use("/api/auth",authRouter);
-app.use("/api/message",messageRouter);
 
-const port=process.env.PORT||3002;
+// middleware that use to get req.body with json format 
+app.use(express.json());
+
+// apies 
+app.use("/api/auth", authRouter);
+app.use("/api/message", messageRouter);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  // ✅ FIXED wildcard
+  app.get(/.*/, (req, res) => {
+    res.sendFile(
+      path.join(__dirname, "../frontend/dist/index.html")
+    );
+  });
+}
+
+const port = process.env.PORT || 3002;
 
 app.listen(port, () => {
-  console.log(`server is running on port ${port}`);
+  console.log(` Server running on port ${port}`);
+  dbConnection();
 });
