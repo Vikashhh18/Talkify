@@ -4,6 +4,7 @@ import authRouter from "./Routes/auth.route.js";
 import messageRouter from "./Routes/message.route.js";
 import path from "path";
 import dbConnection from "./utils/dbConnection.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const __dirname = path.resolve();
@@ -11,6 +12,7 @@ const __dirname = path.resolve();
 
 // middleware that use to get req.body with json format 
 app.use(express.json());
+app.use(cookieParser());
 
 // apies 
 app.use("/api/auth", authRouter);

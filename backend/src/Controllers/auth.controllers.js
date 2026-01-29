@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import { generateToken } from "../utils/util.js";
 import "dotenv/config";
 import { sendWelcomeEmail } from "../Email/emailHandler.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const loginController = async (req, res) => {
     const {email,password}=req.body;
@@ -102,4 +103,21 @@ export const registerController = async (req, res) => {
 export const logoutController = async (req, res) => {
     res.cookie("jwt","",{maxAge:0});
     res.status(200).json({message:"User Logout Successfully"});
+}
+
+export const updateProfileController=async(req,res)=>{
+    try {
+        const {profilePic}=req.body;
+
+        if(!profilePic)return res.status(401).json({message:"Profile pic required"});
+
+        const uploadResponse=await cloudinary.uploader.upload(profilePic);
+        const userId=req.user._id;
+
+        const updatedUser=await User.findByIdAndUpdate(userId,{profilePic:uploadResponse.secure_url},{new:true});
+
+        res.status(201).json(updatedUser);
+    } catch (error) {
+        console.log("Error in updateProfileController: ",error);
+    }
 }
