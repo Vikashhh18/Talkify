@@ -5,27 +5,33 @@ import "dotenv/config";
 import { sendWelcomeEmail } from "../Email/emailHandler.js";
 
 export const loginController = async (req, res) => {
-    // try {
-    //     const {email,password}=req.body;
-    //     if(!email ||!password){
-    //         return res.status(400).json({message:"fill all require field"});
-    //     }
+    const {email,password}=req.body;
+    try {
+        if(!email ||!password){
+            return res.status(400).json({message:"fill all require field"});
+        }
 
-    //     const userExist=await User.findOne({email});
-    //     if(!userExist){
-    //         return res.status(400).json({message:"Email not be registered"});
-    //     }
+        const userExist=await User.findOne({email});
+        if(!userExist){
+            return res.status(400).json({message:"Email not be registered"});
+        }
 
-    //     const hashedPass=userExist.password;
-    //     const passwordCheck=await bcrypt.compare(hashedPass,password);
-    //     if(!passwordCheck){
-    //         return res.status(400).json({message:"Passowrd is not matched"});
-    //     }
+        const passwordCheck=await bcrypt.compare(password,userExist.password);
+        if(!passwordCheck){
+            return res.status(400).json({message:"Passowrd is not matched"});
+        }
 
+        generateToken(userExist._id,res);
+        res.status(200).json({
+            _id:userExist._id,
+            fullName:userExist.fullName,
+            email:userExist.email,
+            profilePic:userExist.profilePic
+        });
 
-    // } catch (error) {
-
-    // }
+    } catch (error) {
+        console.log("Error in login part: ",error)
+    }
 }
 
 export const registerController = async (req, res) => {
@@ -94,9 +100,6 @@ export const registerController = async (req, res) => {
 }
 
 export const logoutController = async (req, res) => {
-    try {
-        res.send("i am in logout controller");
-    } catch (error) {
-
-    }
+    res.cookie("jwt","",{maxAge:0});
+    res.status(200).json({message:"User Logout Successfully"});
 }
