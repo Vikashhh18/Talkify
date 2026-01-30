@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // apies 
+
 app.use("/api/auth", authRouter);
 app.use("/api/message", messageRouter);
 
