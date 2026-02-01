@@ -3,11 +3,11 @@ import jwt from 'jsonwebtoken'
 export const protectRouteMiddleware=async(req,res,next)=>{
     try {
         const token=req.cookies.jwt;
-        console.log("Cookies:", req.cookies," done ji ");
+        // console.log("Cookies:", req.cookies," done ji ");
         if(!token)return res.status(201).json({message:"Unauthorized access - no token"});
 
         const verifyToken=jwt.verify(token,process.env.JWT_SECRET);
-        console.log(verifyToken);
+        // console.log(verifyToken);
 
         if(!verifyToken)return res.status(201).json({message:"Unauthorized access- Token is invalid"});
 
