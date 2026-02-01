@@ -35,6 +35,8 @@ export const sendMessage=async(req,res)=>{
         const senderId=req.user._id;
         // console.log(first)
         const {id}=req.params;
+
+        if(!text &&!image)return res.status(400).json({message:"Text or image is required"});
         let imageUrl;
         if(image){
             const uploadResponse=await cloudinary.uploader.upload(image);
