@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import jwt from 'jsonwebtoken'
+
 export const protectRouteMiddleware=async(req,res,next)=>{
     try {
         const token=req.cookies.jwt;
@@ -14,7 +15,7 @@ export const protectRouteMiddleware=async(req,res,next)=>{
         const user=await User.findById(verifyToken.userId).select("-password");
         if(!user)return res.status(200).json({message:"USer not found"});
 
-        req.user=user
+        req.user=user;
         next();
     } catch (error) {
         console.log("Error accur in auth middleware: ",error)
