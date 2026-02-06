@@ -31,7 +31,8 @@ export const loginController = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("Error in login part: ",error)
+        console.log("Error in login part: ",error);
+        throw error("internal error");
     }
 }
 

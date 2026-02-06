@@ -8,7 +8,7 @@ authRouter.use(arcjetProtection);
 
 authRouter.post("/register",registerController)
 authRouter.post("/login",loginController)
-authRouter.post("/logout",logoutController)
+authRouter.post("/logout",protectRouteMiddleware,logoutController)
 authRouter.put("/update-profile",protectRouteMiddleware,updateProfileController)
 
 authRouter.get("/check",protectRouteMiddleware,(req,res)=>{
