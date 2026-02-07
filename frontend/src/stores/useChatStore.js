@@ -51,14 +51,16 @@ export const useChatStore = create((set, get) => ({
       set({ isUsersLoading: false });
     }
   },
-
-  // ✅ IMPORTANT: clear data on logout
-  // resetChat: () =>
-  //   set({
-  //     allContacts: [],
-  //     chats: [],
-  //     messages: [],
-  //     selectedUser: null,
-  //     activeTab: "chats",
-  //   }),
+  getMessagesByUserId:async(userId)=>{
+    set({isMessagesLoading:true});
+    try {
+      const res=await axiosInstance.get(`/message/chat/${userId}`);
+      set({message:res.data});
+    } catch (error) {
+      toast.error(error.response?.data?.message||"Something went wrong");
+    }
+    finally{
+      set({isMessagesLoading:false});
+    }
+  }
 }));
