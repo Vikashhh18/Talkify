@@ -106,19 +106,23 @@ export const logoutController = async (req, res) => {
     res.status(200).json({message:"User Logout Successfully"});
 }
 
-export const updateProfileController=async(req,res)=>{
-    try {
-        const {profilePic}=req.body;
+export const updateProfileController = async (req, res) => {
+  try {
+    const { profilePic } = req.body;
+    if (!profilePic)
+      return res.status(400).json({ message: "Profile pic required" });
 
-        if(!profilePic)return res.status(401).json({message:"Profile pic required"});
+    const uploadResponse = await cloudinary.uploader.upload(profilePic);
 
-        const uploadResponse=await cloudinary.uploader.upload(profilePic);
-        const userId=req.user._id;
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { profilePic: uploadResponse.secure_url },
+      { new: true }
+    );
 
-        const updatedUser=await User.findByIdAndUpdate(userId,{profilePic:uploadResponse.secure_url},{new:true});
-
-        res.status(201).json(updatedUser);
-    } catch (error) {
-        console.log("Error in updateProfileController: ",error);
-    }
-}
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log("Error in updateProfileController:", error);
+    res.status(500).json({ message: "Profile update failed" });
+  }
+};
