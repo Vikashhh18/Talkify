@@ -6,8 +6,9 @@ import path from "path";
 import dbConnection from "./utils/dbConnection.js";
 import cookieParser from "cookie-parser";
 import cors from 'cors'
+import { app, server } from "./utils/socket.js";
 
-const app = express();
+// const app = express();
 const __dirname = path.resolve();
 
 
@@ -34,7 +35,7 @@ if (process.env.NODE_ENV === "production") {
 }
 const port = process.env.PORT || 3002;
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(` Server running on port ${port}`);
   dbConnection();
 });

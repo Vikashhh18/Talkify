@@ -1,32 +1,43 @@
-import React from 'react'
-import { useChatStore } from '../stores/useChatStore';
-import { XIcon } from 'lucide-react';
+import React from "react";
+import { useChatStore } from "../stores/useChatStore";
+import { useAuthStore } from "../stores/useAuthStore";
 
 const ChatHeader = () => {
-      const { selectedUser, setSelectedUser } = useChatStore();
-  return (
-     <div
-      className="flex justify-between items-center bg-slate-800/50 border-b
-   border-slate-700/50 max-h-[84px] px-6 flex-1"
-    >
-      <div className="flex items-center space-x-3">
-        <div className={`avatar offline`}>
-          <div className="w-12 rounded-full">
-            <img src={selectedUser.profilePic || "/avatar.png"} alt={selectedUser.fullName} />
-          </div>
-        </div>
+  const { selectedUser } = useChatStore();
+  const { onlineUsers } = useAuthStore();
 
-        <div>
-          <h3 className="text-slate-200 font-medium">{selectedUser.fullName}</h3>
-          <p className="text-slate-400 text-sm">{"Offline"}</p>
-        </div>
+  if (!selectedUser) return null;
+
+  const isOnline = onlineUsers.includes(selectedUser._id);
+
+  return (
+    <div className="h-16 px-6 flex items-center gap-3 border-b border-slate-800 bg-slate-900">
+      
+      {/* Avatar */}
+      <div className="relative size-10">
+        <img
+          src={selectedUser.profilePic || "/avatar.png"}
+          alt={selectedUser.fullName}
+          className="rounded-full size-10 object-cover"
+        />
+
+        {/* 🟢 Online Dot */}
+        {isOnline && (
+          <span className="absolute top-1 right-1 size-2.5 bg-green-500 border-2 border-slate-900 rounded-full" />
+        )}
       </div>
 
-      <button onClick={() => setSelectedUser(null)}>
-        <XIcon className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" />
-      </button>
+      {/* Name + status */}
+      <div className="flex flex-col">
+        <h4 className="text-slate-200 font-medium leading-tight">
+          {selectedUser.fullName}
+        </h4>
+        <span className="text-xs text-green-400">
+          {isOnline ? "Online" : "Offline"}
+        </span>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default ChatHeader
+export default ChatHeader;
