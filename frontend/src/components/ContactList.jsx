@@ -34,20 +34,19 @@ const ContactList = () => {
           >
             <div className="flex items-center gap-3">
               {/* PROFILE PIC + GREEN DOT */}
-              <div className="relative w-12 h-12">
-                <img
-                  src={contact.profilePic || "/avatar.png"}
-                  alt={contact.fullName}
-                  className="w-full h-full rounded-full object-cover"
-                />
+             <div className="relative w-12 h-12">
+  <img
+    src={contact.profilePic || "/avatar.png"}
+    alt={contact.fullName}
+    className="w-full h-full rounded-full object-cover"
+  />
 
-                {/* ✅ GREEN / GRAY DOT */}
-                <span
-                  className={`absolute top-1 right-0.5 size-3 rounded-full border-2 border-slate-900 ${
-                    isOnline ? "bg-green-500" : "bg-gray-500"
-                  }`}
-                />
-              </div>
+  <span
+    className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full 
+      border-2 border-slate-800
+      ${isOnline ? "bg-green-500" : "bg-slate-400"}`}
+  />
+</div>
 
               <h4 className="text-slate-200 font-medium">
                 {contact.fullName}

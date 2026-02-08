@@ -91,5 +91,30 @@ export const useChatStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Something went wrong");
     }
   },
+  subscribeToMessages: () => {
+  const socket = useAuthStore.getState().socket;
+  const { selectedUser, isSoundEnabled } = get();
 
+  if (!socket || !selectedUser) return;
+
+  socket.off("newMessage"); 
+
+  socket.on("newMessage", (newMessage) => {
+    if (newMessage.senderId !== selectedUser._id) return;
+
+    set((state) => ({
+      messages: [...state.messages, newMessage],
+    }));
+
+    if (isSoundEnabled) {
+      const audio = new Audio("/sounds/notification.mp3");
+      audio.play().catch(() => {});
+    }
+  });
+},
+
+  unsubscribeFromMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket.off("newMessage");
+  },
 }));
