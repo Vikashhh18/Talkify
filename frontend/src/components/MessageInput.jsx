@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import useKeyboardSound from "../hooks/useKeyboardSound";
 import toast from "react-hot-toast";
-import { ImageIcon, SendIcon, XIcon } from "lucide-react";
+import { Image, Send, X } from "lucide-react";
 import { useChatStore } from "../stores/useChatStore";
 
 function MessageInput() {
@@ -10,25 +10,37 @@ function MessageInput() {
   const [imagePreview, setImagePreview] = useState(null);
 
   const fileInputRef = useRef(null);
+  const textInputRef = useRef(null);
 
   const { sendMessage, isSoundEnabled } = useChatStore();
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
-    if (isSoundEnabled) playRandomKeyStrokeSound();
+    
+    if (isSoundEnabled) {
+      playRandomKeyStrokeSound();
+    }
 
     sendMessage({
       text: text.trim(),
       image: imagePreview,
     });
+    
     setText("");
-    setImagePreview("");
+    setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    
+    // Focus back on input
+    setTimeout(() => {
+      textInputRef.current?.focus();
+    }, 0);
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
+    if (!file) return;
+
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
@@ -36,6 +48,7 @@ function MessageInput() {
 
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result);
+    reader.onerror = () => toast.error("Failed to load image");
     reader.readAsDataURL(file);
   };
 
@@ -44,65 +57,99 @@ function MessageInput() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage(e);
+    }
+  };
+
   return (
-    <div className="p-4 border-t border-slate-700/50">
+    <div className="w-full">
+      {/* Image Preview */}
       {imagePreview && (
-        <div className="max-w-3xl mx-auto mb-3 flex items-center">
-          <div className="relative">
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="w-20 h-20 object-cover rounded-lg border border-slate-700"
-            />
+        <div className="max-w-4xl mx-auto mb-3 px-3 sm:px-4">
+          <div className="relative inline-block">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-slate-600">
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
+            </div>
             <button
               onClick={removeImage}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-700"
+              className="absolute -top-1.5 -right-1.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:bg-slate-600 border border-slate-600 transition-all duration-200"
               type="button"
+              aria-label="Remove image"
             >
-              <XIcon className="w-4 h-4" />
+              <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </button>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex space-x-4">
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            isSoundEnabled && playRandomKeyStrokeSound();
-          }}
-          className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg py-2 px-4"
-          placeholder="Type your message..."
-        />
+      {/* Main Input Form */}
+      <form onSubmit={handleSendMessage} className="w-full max-w-4xl mx-auto px-3 sm:px-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* File Input Button */}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+            className="hidden"
+            id="image-upload"
+            aria-label="Upload image"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-2.5 sm:p-3 rounded-lg border transition-all duration-200 ${
+              imagePreview 
+                ? 'bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-cyan-500/30 text-cyan-400' 
+                : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-400 hover:text-slate-300'
+            }`}
+            aria-label="Attach image"
+          >
+            <Image className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
 
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleImageChange}
-          className="hidden"
-        />
+          {/* Text Input */}
+          <div className="flex-1 relative min-w-0">
+            <input
+              ref={textInputRef}
+              type="text"
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value);
+                isSoundEnabled && playRandomKeyStrokeSound();
+              }}
+              onKeyDown={handleKeyPress}
+              className="w-full bg-slate-700 border border-slate-600 rounded-xl py-3 sm:py-3.5 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all text-sm sm:text-base"
+              placeholder="Type your message..."
+              aria-label="Message input"
+              autoComplete="off"
+            />
+          </div>
 
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className={`bg-slate-800/50 text-slate-400 hover:text-slate-200 rounded-lg px-4 transition-colors ${
-            imagePreview ? "text-cyan-500" : ""
-          }`}
-        >
-          <ImageIcon className="w-5 h-5" />
-        </button>
-        <button
-          type="submit"
-          disabled={!text.trim() && !imagePreview}
-          className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-lg px-4 py-2 font-medium hover:from-cyan-600 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <SendIcon className="w-5 h-5" />
-        </button>
+          {/* Send Button */}
+          <button
+            type="submit"
+            disabled={!text.trim() && !imagePreview}
+            className={`p-3 sm:p-3.5 rounded-xl transition-all duration-200 ${
+              text.trim() || imagePreview
+                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-700 hover:to-blue-700'
+                : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+            }`}
+            aria-label="Send message"
+          >
+            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+        </div>
       </form>
     </div>
   );
 }
+
 export default MessageInput;

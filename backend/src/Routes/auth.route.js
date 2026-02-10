@@ -2,15 +2,26 @@ import express from 'express';
 import { loginController, logoutController, registerController ,updateProfileController} from '../Controllers/auth.controllers.js';
 import { protectRouteMiddleware } from '../middleware/auth.middleware.js';
 import { arcjetProtection } from '../middleware/arcjet.middleware.js';
+import multer from "multer";
+
 const authRouter=express.Router();
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 authRouter.use(arcjetProtection);
 
 authRouter.post("/register",registerController)
 authRouter.post("/login",loginController)
 authRouter.post("/logout",protectRouteMiddleware,logoutController)
-authRouter.put("/update-profile",protectRouteMiddleware,updateProfileController)
+// authRouter.put("/update-profile",protectRouteMiddleware,updateProfileController)
 
+
+authRouter.put(
+  "/update-profile",
+  protectRouteMiddleware,
+  upload.single("profilePic"), // 🔥 REQUIRED
+  updateProfileController
+);
 authRouter.get("/check",protectRouteMiddleware,(req,res)=>{
     res.status(201).json(req.user);
 })

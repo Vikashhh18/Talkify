@@ -111,10 +111,28 @@ export const useChatStore = create((set, get) => ({
       audio.play().catch(() => {});
     }
   });
+  
+  // typing indicators
+  socket.off("typing");
+  socket.off("stopTyping");
+
+  socket.on("typing", ({ from, receiverId }) => {
+    if (!selectedUser) return;
+    if (from !== selectedUser._id) return;
+    set({ typingUserId: from });
+  });
+
+  socket.on("stopTyping", ({ from, receiverId }) => {
+    if (!selectedUser) return;
+    if (from !== selectedUser._id) return;
+    set({ typingUserId: null });
+  });
 },
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
     socket.off("newMessage");
+    socket.off("typing");
+    socket.off("stopTyping");
   },
 }));

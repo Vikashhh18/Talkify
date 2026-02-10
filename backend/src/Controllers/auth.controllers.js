@@ -106,19 +106,44 @@ export const logoutController = async (req, res) => {
     res.status(200).json({message:"User Logout Successfully"});
 }
 
+// export const updateProfileController = async (req, res) => {
+//   try {
+//     const { profilePic } = req.body;
+//     if (!profilePic)
+//       return res.status(400).json({ message: "Profile pic required" });
+
+//     const uploadResponse = await cloudinary.uploader.upload(profilePic);
+
+//     const updatedUser = await User.findByIdAndUpdate(
+//       req.user._id,
+//       { profilePic: uploadResponse.secure_url },
+//       { new: true }
+//     );
+
+//     res.status(200).json(updatedUser);
+//   } catch (error) {
+//     console.log("Error in updateProfileController:", error);
+//     res.status(500).json({ message: "Profile update failed" });
+//   }
+// };
+
 export const updateProfileController = async (req, res) => {
   try {
-    const { profilePic } = req.body;
-    if (!profilePic)
+    if (!req.file) {
       return res.status(400).json({ message: "Profile pic required" });
+    }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+    const uploadResponse = await cloudinary.uploader.upload(base64Image, {
+      folder: "chatify/profile-pics",
+    });
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { profilePic: uploadResponse.secure_url },
       { new: true }
-    );
+    ).select("-password");
 
     res.status(200).json(updatedUser);
   } catch (error) {
