@@ -40,7 +40,7 @@ const LoginPage = () => {
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center">
                 <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">Chatify</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">Talkify</h1>
             </div>
 
             {/* Heading */}
