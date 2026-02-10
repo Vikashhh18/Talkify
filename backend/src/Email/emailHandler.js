@@ -6,18 +6,38 @@ import { createWelcomeEmailTemplate } from "./emailTemplate.js";
 
 import "dotenv/config";
 
+// export const sendWelcomeEmail = async (email, name, clientURL) => {
+//   const { data, error } = await resendClient.emails.send({
+//     from: `${sender.name} <${sender.email}>`,
+//     to: email,
+//     subject: "Welcome to Chatify!",
+//     html: createWelcomeEmailTemplate(name, clientURL),
+//   });
+
+//   if (error) {
+//     console.error("Error sending welcome email:", error);
+//     throw new Error("Failed to send welcome email");
+//   }
+
+//   console.log("Welcome Email sent successfully", data);
+// };
+
 export const sendWelcomeEmail = async (email, name, clientURL) => {
-  const { data, error } = await resendClient.emails.send({
-    from: `${sender.name} <${sender.email}>`,
-    to: email,
-    subject: "Welcome to Chatify!",
-    html: createWelcomeEmailTemplate(name, clientURL),
-  });
+  try {
+    const { data, error } = await resendClient.emails.send({
+      from: `${sender.name} <${sender.email}>`,
+      to: email,
+      subject: "Welcome to Chatify!",
+      html: createWelcomeEmailTemplate(name, clientURL),
+    });
 
-  if (error) {
-    console.error("Error sending welcome email:", error);
-    throw new Error("Failed to send welcome email");
+    if (error) {
+      console.error("Welcome email skipped:", error.message);
+      return;
+    }
+
+    console.log("Welcome Email sent successfully", data);
+  } catch (err) {
+    console.error("Email service error:", err.message);
   }
-
-  console.log("Welcome Email sent successfully", data);
 };

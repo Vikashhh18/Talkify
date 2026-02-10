@@ -7,19 +7,19 @@ export const protectRouteMiddleware = async (req, res, next) => {
 
     // ❌ No token
     if (!token) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized - token is not there" });
     }
 
     // ❌ Invalid token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded?.userId) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized tokan" });
     }
 
     // ❌ User not found
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized - user not found" });
     }
 
     // ✅ Success
