@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:3001/api",
+  baseURL: "https://talkify-cc5m.onrender.com/api",
   withCredentials: true,
 });
