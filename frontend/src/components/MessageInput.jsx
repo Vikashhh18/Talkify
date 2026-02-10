@@ -1,37 +1,31 @@
 import { useRef, useState } from "react";
-import useKeyboardSound from "../hooks/useKeyboardSound";
 import toast from "react-hot-toast";
 import { Image, Send, X } from "lucide-react";
 import { useChatStore } from "../stores/useChatStore";
 
 function MessageInput() {
-  const { playRandomKeyStrokeSound } = useKeyboardSound();
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
 
   const fileInputRef = useRef(null);
   const textInputRef = useRef(null);
 
-  const { sendMessage, isSoundEnabled } = useChatStore();
+  const { sendMessage } = useChatStore();
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
-    
-    if (isSoundEnabled) {
-      playRandomKeyStrokeSound();
-    }
 
     sendMessage({
       text: text.trim(),
       image: imagePreview,
     });
-    
+
     setText("");
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    
-    // Focus back on input
+
+    // focus back on input
     setTimeout(() => {
       textInputRef.current?.focus();
     }, 0);
@@ -58,7 +52,7 @@ function MessageInput() {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage(e);
     }
@@ -79,8 +73,8 @@ function MessageInput() {
             </div>
             <button
               onClick={removeImage}
-              className="absolute -top-1.5 -right-1.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:bg-slate-600 border border-slate-600 transition-all duration-200"
               type="button"
+              className="absolute -top-1.5 -right-1.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:bg-slate-600 border border-slate-600 transition"
               aria-label="Remove image"
             >
               <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -89,60 +83,52 @@ function MessageInput() {
         </div>
       )}
 
-      {/* Main Input Form */}
-      <form onSubmit={handleSendMessage} className="w-full max-w-4xl mx-auto px-3 sm:px-4">
+      {/* Input Form */}
+      <form
+        onSubmit={handleSendMessage}
+        className="w-full max-w-4xl mx-auto px-3 sm:px-4"
+      >
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* File Input Button */}
+          {/* Image Upload */}
           <input
             type="file"
             accept="image/*"
             ref={fileInputRef}
             onChange={handleImageChange}
             className="hidden"
-            id="image-upload"
-            aria-label="Upload image"
           />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`p-2.5 sm:p-3 rounded-lg border transition-all duration-200 ${
-              imagePreview 
-                ? 'bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-cyan-500/30 text-cyan-400' 
-                : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-400 hover:text-slate-300'
+            className={`p-2.5 sm:p-3 rounded-lg border transition ${
+              imagePreview
+                ? "bg-cyan-600/20 border-cyan-500/30 text-cyan-400"
+                : "bg-slate-700 border-slate-600 text-slate-400 hover:bg-slate-600"
             }`}
-            aria-label="Attach image"
           >
             <Image className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {/* Text Input */}
-          <div className="flex-1 relative min-w-0">
-            <input
-              ref={textInputRef}
-              type="text"
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-                isSoundEnabled && playRandomKeyStrokeSound();
-              }}
-              onKeyDown={handleKeyPress}
-              className="w-full bg-slate-700 border border-slate-600 rounded-xl py-3 sm:py-3.5 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all text-sm sm:text-base"
-              placeholder="Type your message..."
-              aria-label="Message input"
-              autoComplete="off"
-            />
-          </div>
+          <input
+            ref={textInputRef}
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="Type your message..."
+            className="flex-1 bg-slate-700 border border-slate-600 rounded-xl py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+          />
 
-          {/* Send Button */}
+          {/* Send */}
           <button
             type="submit"
             disabled={!text.trim() && !imagePreview}
-            className={`p-3 sm:p-3.5 rounded-xl transition-all duration-200 ${
+            className={`p-3 rounded-xl transition ${
               text.trim() || imagePreview
-                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-700 hover:to-blue-700'
-                : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white"
+                : "bg-slate-700 text-slate-500 cursor-not-allowed"
             }`}
-            aria-label="Send message"
           >
             <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
