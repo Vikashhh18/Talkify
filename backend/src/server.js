@@ -11,10 +11,16 @@ import { app, server } from "./utils/socket.js";
 // const app = express();
 const __dirname = path.resolve();
 
+console.log("CORS origin:", process.env.CLIENT_URL);
 
 // middleware that use to get req.body with json format 
 app.use(express.json());
-app.use(cors({origin:process.env.CLIENT_URL,credentials:true}))
+
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+}));
+
 // app.options("*", cors());
 app.use(cookieParser());
 
