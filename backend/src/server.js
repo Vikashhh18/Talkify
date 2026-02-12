@@ -26,13 +26,13 @@ app.use("/api/message", messageRouter);
 
 // ✅ SERVE FRONTEND
 if (process.env.NODE_ENV === "production") {
+  const path = require("path");
+  const __dirname = path.resolve();
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-app.use((req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../frontend/dist/index.html")
-  );
-});
+  app.get("*", (_, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  });
 }
 
 const PORT = process.env.PORT || 3001;
