@@ -17,8 +17,8 @@ console.log("CORS origin:", process.env.CLIENT_URL);
 app.use(express.json());
 
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true,
+  origin: "https://talkify-frontend-url.onrender.com", // EXACT frontend URL
+  credentials: true
 }));
 
 // app.options("*", cors());
