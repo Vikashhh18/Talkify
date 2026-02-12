@@ -1,7 +1,10 @@
 {
-  "name": "chatify",
+  "name": "chatify-app",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "build":"npm install --prefix frontend && npm install --prefix backend && npm run build --prefix frontend",
     "start":"npm run dev --prefix backend"
@@ -11,3 +14,5 @@
   "license": "ISC",
   "description": ""
 }
+
+    
