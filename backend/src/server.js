@@ -5,43 +5,39 @@ import messageRouter from "./Routes/message.route.js";
 import path from "path";
 import dbConnection from "./utils/dbConnection.js";
 import cookieParser from "cookie-parser";
-import cors from 'cors'
+import cors from "cors";
 import { app, server } from "./utils/socket.js";
 
-// const app = express();
 const __dirname = path.resolve();
 
-console.log("CORS origin:", process.env.CLIENT_URL);
-
-// middleware that use to get req.body with json format 
-app.use(express.json());
-
+app.use(express.json({ limit: "5mb" }));
+app.use(cookieParser());
 app.use(cors({
-  origin: "https://talkify-frontend-url.onrender.com", // EXACT frontend URL
+  origin: process.env.CLIENT_URL || true,
   credentials: true
 }));
 
-// app.options("*", cors());
-app.use(cookieParser());
-
-// apies 
+app.get("/health", (req, res) => {
+  res.json({ status: "OK" });
+});
 
 app.use("/api/auth", authRouter);
 app.use("/api/message", messageRouter);
 
+// ✅ SERVE FRONTEND
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  // ✅ FIXED wildcard
-  app.get(/.*/, (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "../frontend/dist/index.html")
-    );
-  });
+app.use((req, res) => {
+  res.sendFile(
+    path.join(__dirname, "../frontend/dist/index.html")
+  );
+});
 }
-const port = process.env.PORT || 3002;
 
-server.listen(port, () => {
-  console.log(` Server running on port ${port}`);
+const PORT = process.env.PORT || 3001;
+
+server.listen(PORT, () => {
+  console.log("Server running on port:", PORT);
   dbConnection();
 });
