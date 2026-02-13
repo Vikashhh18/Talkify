@@ -1,14 +1,16 @@
 import "dotenv/config";
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+
 import authRouter from "./Routes/auth.route.js";
 import messageRouter from "./Routes/message.route.js";
 import dbConnection from "./utils/dbConnection.js";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
 import { app, server } from "./utils/socket.js";
 
+/* ✅ FIX: dirname FIRST */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -27,15 +29,12 @@ app.get("/health", (_, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/message", messageRouter);
 
-// ✅ Serve frontend (Express 5 safe)
+/* ✅ Serve frontend */
 if (process.env.NODE_ENV === "production") {
   const distPath = path.join(__dirname, "../../frontend/dist");
   app.use(express.static(distPath));
-  // const path = require("path");
-  const __dirname = path.resolve();
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  app.use((req, res) => {
+  app.get("*", (_, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
