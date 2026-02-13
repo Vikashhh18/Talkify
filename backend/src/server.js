@@ -30,18 +30,15 @@ app.use("/api/auth", authRouter);
 app.use("/api/message", messageRouter);
 
 /* ✅ Serve frontend */
-if (process.env.NODE_ENV === "production") {
-  const distPath = path.join(__dirname, "../../frontend/dist");
-  app.use(express.static(distPath));
+const distPath = path.join(__dirname, "../../frontend/dist");
 
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
-  });
-}
+app.use(express.static(distPath));
+
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
+});
 
 const PORT = process.env.PORT || 3001;
-
-server.listen(PORT, async () => {
-  console.log("🚀 Server running on port:", PORT);
-  await dbConnection();
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
 });
