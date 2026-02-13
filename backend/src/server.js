@@ -1,48 +1,45 @@
-import express from "express";
 import "dotenv/config";
+import express from "express";
 import authRouter from "./Routes/auth.route.js";
 import messageRouter from "./Routes/message.route.js";
-import path from "path";
-import { fileURLToPath } from "url";
 import dbConnection from "./utils/dbConnection.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import { app, server } from "./utils/socket.js";
 
-// ES Module __dirname fix
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
 app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || true,
+  origin: true,
   credentials: true
 }));
 
-app.get("/health", (req, res) => {
+app.get("/health", (_, res) => {
   res.json({ status: "OK" });
 });
 
-// API routes
 app.use("/api/auth", authRouter);
 app.use("/api/message", messageRouter);
 
-// ✅ Serve frontend in production
+// ✅ Serve frontend (Express 5 safe)
 if (process.env.NODE_ENV === "production") {
-  const path = require("path");
-  const __dirname = path.resolve();
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  const distPath = path.join(__dirname, "../../frontend/dist");
+  app.use(express.static(distPath));
 
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  app.use((req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
   });
 }
 
-// Start server
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log("Server running on port:", PORT);
-  dbConnection();
+
+server.listen(PORT, async () => {
+  console.log("🚀 Server running on port:", PORT);
+  await dbConnection();
 });
